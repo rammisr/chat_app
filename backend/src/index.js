@@ -1,19 +1,15 @@
 import express from "express";
-import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-
 import path from "path";
-
-import { connectDB } from "./lib/db.js";
-
+import mongoose from "mongoose"; // Import mongoose
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 import { app, server } from "./lib/socket.js";
 
-dotenv.config();
+const PORT = 5001; // Directly set the port
+const MONGO_URL = "mongodb://127.0.0.1:27017/chatapp"; // Local MongoDB URL
 
-const PORT = process.env.PORT;
 const __dirname = path.resolve();
 
 app.use(express.json());
@@ -37,6 +33,16 @@ if (process.env.NODE_ENV === "production") {
 }
 
 server.listen(PORT, () => {
-  console.log("server is running on PORT:" + PORT);
-  connectDB();
+  console.log("Server is running on PORT:" + PORT);
+
+  // Connect directly to MongoDB (local instance)
+  mongoose.connect(MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => {
+      console.log("Connected to MongoDB at", MONGO_URL);
+    })
+    .catch((error) => {
+      console.log("MongoDB connection error:", error);
+    });
 });
+
+
